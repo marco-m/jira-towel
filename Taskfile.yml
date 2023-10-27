@@ -1,0 +1,73 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  #
+  # As of Go 1.21, we still need to use the linker to embed version information.
+  # See https://github.com/golang/go/issues/50603
+  VERSION: { sh: git describe --long --dirty --always --tags }
+  LDFLAGS: '-ldflags="-X github.com/marco-m/jira-towel/internal.linkerVersion={{.VERSION}}"'
+
+tasks:
+
+  install:deps:
+    desc: Install tool dependencies.
+    cmds:
+      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - go install gotest.tools/gotestsum@latest
+
+  build:
+    desc: Build the loadmaster executable
+    cmds:
+      - mkdir -p bin
+      - go build -C bin {{.LDFLAGS}} ..
+
+  clean:
+    desc: Delete build artifacts
+    cmds:
+      - rm -rf bin
+
+  #
+  # To run tests only for a package:
+  #   go test ./pkg/NAME
+  #
+  # To run tests only matching a glob:
+  #   go test -run "TestGLOB"
+  #
+
+  test:unit:
+    desc: Run the unit tests. Some tests will be listed as "Skipped".
+    cmds:
+      - gotestsum -- -count=1 -coverprofile=bin/coverage.out ./...
+
+  test:all:
+    desc: Run all the tests. No tests will be skipped.
+    cmds:
+      - gotestsum -- -count=1 -coverprofile=bin/coverage.out ./...
+    env:
+      # WARNING: We explicitly set the secret here only to show how the tests use the
+      # Skip() method, without having to require another dependency such as pass or summon
+      # to securely store and read the secret.
+      # DO NOT WRITE SECRETS IN CLEARTEXT!
+      BANANA_TEST_TOKEN: "a-banana-secret"
+
+  test:fuzz:
+    desc: Run all the fuzz tests. Interrupt with Ctrl-C.
+    cmds:
+      - |
+        for i in $(go list ./...)
+        do
+          echo $i
+          go test -fuzz="Fuzz*" $i
+        done
+
+  browser:
+    desc: "Show code coverage in browser (usage: task test:<subtarget> browser)"
+    cmds:
+      - go tool cover -html=bin/coverage.out
+
+  lint:
+    desc: Lint the code.
+    cmds:
+      - golangci-lint run ./...
