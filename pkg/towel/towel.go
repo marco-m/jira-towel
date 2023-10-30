@@ -16,11 +16,12 @@ type Args struct {
 	//
 	Init  *InitCmd  `arg:"subcommand:init" help:"create a configuration directory (to be filled by hand)"`
 	Graph *GraphCmd `arg:"subcommand:graph" help:"generate the dependency graph of a set of tickets"`
+	Query *QueryCmd `arg:"subcommand:query" help:"issue a JQL query and dump its contents"`
+	Dot   *DotCmd   `arg:"subcommand:dot" help:"generate a graphviz DOT file (WIP)"`
 }
 
 type Global struct {
 	ConfigDir string        `help:"configuration directory"`
-	Server    string        `help:"Jira server URL"`
 	Timeout   time.Duration `help:"timeout for network operations (eg: 5m7s)"`
 	Version   bool          `help:"display version and exit"`
 	//
@@ -36,6 +37,7 @@ func (Args) Epilogue() string {
 }
 
 type GraphCmd struct {
+	JQL string `arg:"required" help:"JQL query, for example: 'project = \"MY PROJECT\"''. An empty string is not accepted because it would query ALL the projects in the Jira instance"`
 }
 
 type InitCmd struct {
@@ -79,6 +81,10 @@ func run(cmdLine []string) error {
 		return cmdInit(args.Global, *args.Init)
 	case args.Graph != nil:
 		return cmdGraph(args.Global, *args.Graph)
+	case args.Query != nil:
+		return cmdQuery(args.Global, *args.Query)
+	case args.Dot != nil:
+		return cmdDot(args.Global, *args.Dot)
 	default:
 		return fmt.Errorf("internal error: unwired subcommand: %s", argParser.Subcommand())
 	}

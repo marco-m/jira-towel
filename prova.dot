@@ -1,0 +1,22 @@
+digraph {
+    rankdir=LR
+    node [shape=box style=filled width=2.5 fixedsize="true"]
+
+    // https://graphviz.org/doc/info/colors.html
+    // color state:
+    // to do: cadetblue1
+    // in progress: orange
+    // done: yellowgreen
+
+    "MANGO-2" [label="MANGO-2 (in progress)\nsummary of MANGO-2" fillcolor=orange]
+    "MANGO-3" [label="MANGO-3 (to do)\nsummary of MANGO-3" color=red fillcolor=cadetblue1]
+    "MANGO-4" [label="MANGO-4 (to do)\nsummary of MANGO-4" fillcolor=cadetblue1 color=red]
+    "APPLE-1" [label="APPLE-1 (to do)\nsummary of APPLE-1" fillcolor=cadetblue1]
+    "APPLE-2" [label="APPLE-2 (in progress)\nsummary of APPLE-2" fillcolor=orange]
+    "APPLE-3" [label="APPLE-3 (done)\nsummary of APPLE-3" fillcolor=yellowgreen]
+    "MANGO-5" [label="MANGO-5 (to do)\nsummary of MANGO-5" fillcolor=cadetblue1]
+
+    "MANGO-2" -> "MANGO-3" [label="blocks" color="red"]
+    "MANGO-3" -> "MANGO-4" [label="blocks" color="red"]
+    "APPLE-1" -> "MANGO-3" [label="blocks" color="red"]
+}

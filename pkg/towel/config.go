@@ -11,9 +11,10 @@ import (
 )
 
 type configuration struct {
-	Version int    `json:"version"`
-	Token   string `json:"token"`
-	Server  string `json:"server"`
+	Version  int    `json:"version"`
+	Email    string `json:"email"`
+	ApiToken string `json:"api_token"`
+	Server   string `json:"server"`
 }
 
 // loadConfig parses and validates the configuration file.
@@ -78,9 +79,10 @@ func initConfig(configDir string) error {
 	}
 
 	config := configuration{
-		Version: 1,
-		Token:   "The Jira API token; see README",
-		Server:  "URL to your JIRA instance",
+		Version:  1,
+		Email:    "The email of the JIRA user with the API token; see README",
+		ApiToken: "The Jira API token; see README",
+		Server:   "URL to your JIRA instance",
 	}
 
 	buf, err := json.MarshalIndent(config, "", "    ")
