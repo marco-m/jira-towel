@@ -14,13 +14,15 @@ import (
 type Args struct {
 	Global
 	//
+	Init  *InitCmd  `arg:"subcommand:init" help:"create a configuration directory (to be filled by hand)"`
 	Graph *GraphCmd `arg:"subcommand:graph" help:"generate the dependency graph of a set of tickets"`
 }
 
 type Global struct {
-	Server  string        `arg:"required" help:"Jira server URL"`
-	Timeout time.Duration `help:"timeout for network operations (eg: 1h32m7s)"`
-	Version bool          `help:"display version and exit"`
+	ConfigDir string        `help:"configuration directory"`
+	Server    string        `help:"Jira server URL"`
+	Timeout   time.Duration `help:"timeout for network operations (eg: 5m7s)"`
+	Version   bool          `help:"display version and exit"`
 	//
 	HttpClient *http.Client `arg:"-"` // Overridable for tests.
 }
@@ -34,21 +36,29 @@ func (Args) Epilogue() string {
 }
 
 type GraphCmd struct {
-	Pipeline string `arg:"required"`
+}
+
+type InitCmd struct {
 }
 
 func Main() int {
 	if err := run(os.Args[1:]); err != nil {
-		fmt.Println("error:", err)
+		fmt.Println(err)
 		return 1
 	}
 	return 0
 }
 
 func run(cmdLine []string) error {
+	defaultConfigDir, err := defaultConfigDir()
+	if err != nil {
+		return fmt.Errorf("user configuration directory: %w", err)
+	}
+
 	args := Args{
 		Global: Global{
-			Timeout: 5 * time.Second,
+			ConfigDir: defaultConfigDir,
+			Timeout:   5 * time.Second,
 		},
 	}
 	argParser, err := arg.NewParser(arg.Config{}, &args)
@@ -65,6 +75,10 @@ func run(cmdLine []string) error {
 	}
 
 	switch {
+	case args.Init != nil:
+		return cmdInit(args.Global, *args.Init)
+	case args.Graph != nil:
+		return cmdGraph(args.Global, *args.Graph)
 	default:
 		return fmt.Errorf("internal error: unwired subcommand: %s", argParser.Subcommand())
 	}
