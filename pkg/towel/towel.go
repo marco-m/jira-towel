@@ -23,12 +23,14 @@ func MainErr(args []string) error {
 		return fmt.Errorf("user configuration directory: %w", err)
 	}
 
-	app := App{}
+	app := App{
+		HttpClient: &http.Client{},
+	}
 	cli := clim.New[App]("jira-towel", "attempt to make life with Jira bearable", nil)
 
 	cli.AddFlag(&clim.Flag{
 		Value: clim.String(&app.ConfigDir, defaultConfigDir),
-		Long:  "config-dir", Help: "Configuration directory",
+		Long:  "config-dir", Label: "DIR", Help: "Configuration directory",
 	})
 	cli.AddFlag(&clim.Flag{
 		Value: clim.String(&app.Server, "FIXME"),
@@ -49,6 +51,8 @@ func MainErr(args []string) error {
 
 	cli.AddCLI(newInitCLI())
 	cli.AddCLI(newGraphCLI())
+	cli.AddCLI(newQueryCLI())
+	cli.AddCLI(newDotCLI())
 	cli.AddCLI(versionCmd)
 
 	action, err := cli.Parse(args)
