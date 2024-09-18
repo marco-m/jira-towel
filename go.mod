@@ -1,7 +1,7 @@
 module github.com/marco-m/jira-towel
 
-go 1.21.3
+go 1.23.0
 
-require github.com/alexflint/go-arg v1.4.4-0.20231010223646-bf629a16cbe5
+require github.com/marco-m/clim v0.0.8
 
-require github.com/alexflint/go-scalar v1.2.0 // indirect
+require golang.org/x/exp v0.0.0-20240823005443-9b4947da3948 // indirect
