@@ -10,7 +10,18 @@ test_task:
   smoke_script: go run . -h
 
 lint_task:
-  #name: GolangCI Lint
   container:
     image: golangci/golangci-lint:latest
   run_script: golangci-lint run
+
+# release_task:
+#   container:
+#     image: goreleaser/goreleaser:latest
+#   only_if: $CIRRUS_TAG != '' # run only on tags
+#   depends_on:
+#     - test
+#     - lint
+#     # any other sanity tasks
+#   env:
+#     GITHUB_TOKEN: ENCRYPTED[ABC]
+#   release_script: goreleaser
