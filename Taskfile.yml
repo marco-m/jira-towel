@@ -18,7 +18,7 @@ tasks:
       - go install gotest.tools/gotestsum@latest
 
   build:
-    desc: Build the loadmaster executable
+    desc: Build the jira-towel executable
     cmds:
       - mkdir -p bin
       - go build -C bin {{.LDFLAGS}} ..
@@ -46,10 +46,11 @@ tasks:
     cmds:
       - gotestsum -- -count=1 -coverprofile=bin/coverage.out ./...
     env:
-      # WARNING: We explicitly set the secret here only to show how the tests use the
-      # Skip() method, without having to require another dependency such as pass or summon
-      # to securely store and read the secret.
-      # DO NOT WRITE SECRETS IN CLEARTEXT!
+      # SECURITY WARNING: DO NOT STORE SECRETS IN CLEARTEXT!
+      # Here we explicitly set the secret only to show how the tests use the
+      # Skip() method.
+      # For real usage, use `pass` or `summon` or equivalent to securely store
+      # and retrieve the secrets.
       BANANA_TEST_TOKEN: "a-banana-secret"
 
   test:fuzz:
