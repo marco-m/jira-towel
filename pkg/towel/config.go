@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 )
 
-type configuration struct {
+type Config struct {
 	Version  int    `json:"version"`
 	Email    string `json:"email"`
 	ApiToken string `json:"api_token"`
@@ -18,54 +18,54 @@ type configuration struct {
 }
 
 // loadConfig parses and validates the configuration file.
-func loadConfig(configDir string) (configuration, error) {
+func loadConfig(configDir string) (Config, error) {
 	configFile := configFile(configDir)
 	file, err := os.Open(configFile)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
-			return configuration{},
+			return Config{},
 				fmt.Errorf("opening configuration file %q: not found. Run 'jira-towel init' to create it", configFile)
 		}
-		return configuration{},
+		return Config{},
 			fmt.Errorf("opening configuration file %q: %s", configFile, err)
 	}
 	fileInfo, err := file.Stat()
 	if err != nil {
-		return configuration{},
+		return Config{},
 			fmt.Errorf("getting info about configuration file %q: %s", configFile, err)
 	}
 	perm := fileInfo.Mode().Perm()
-	if perm != 0600 && perm != 0400 {
-		return configuration{},
+	if perm != 0o600 && perm != 0o400 {
+		return Config{},
 			fmt.Errorf("configuration file %q must be readable only by the owner (0600), while it has permissions 0%o",
 				configFile, perm)
 	}
 
 	buf, err := io.ReadAll(file)
 	if err != nil {
-		return configuration{}, fmt.Errorf("reading configuration file %q: %s", configFile, err)
+		return Config{}, fmt.Errorf("reading configuration file %q: %s", configFile, err)
 	}
 
-	var config configuration
+	var config Config
 	if err := json.Unmarshal(buf, &config); err != nil {
-		return configuration{}, err
+		return Config{}, err
 	}
 
 	if err := validateConfig(config); err != nil {
-		return configuration{}, fmt.Errorf("config file %q: %s", configFile, err)
+		return Config{}, fmt.Errorf("config file %q: %s", configFile, err)
 	}
 
 	return config, nil
 }
 
 // TODO actually validate something!
-func validateConfig(config configuration) error {
+func validateConfig(config Config) error {
 	return nil
 }
 
 // initConfig initialises the configuration file.
 func initConfig(configDir string) error {
-	if err := os.MkdirAll(configDir, 0700); err != nil {
+	if err := os.MkdirAll(configDir, 0o700); err != nil {
 		return err
 	}
 
@@ -78,7 +78,7 @@ func initConfig(configDir string) error {
 		return err
 	}
 
-	config := configuration{
+	config := Config{
 		Version:  1,
 		Email:    "The email of the JIRA user with the API token; see README",
 		ApiToken: "The Jira API token; see README",
@@ -90,7 +90,7 @@ func initConfig(configDir string) error {
 		return err
 	}
 
-	file, err := os.OpenFile(configFile, os.O_RDWR|os.O_CREATE, 0600)
+	file, err := os.OpenFile(configFile, os.O_RDWR|os.O_CREATE, 0o600)
 	if err != nil {
 		return err
 	}

@@ -18,7 +18,7 @@ func mainInt() int {
 	if err == nil {
 		return 0
 	}
-	fmt.Println(err)
+	fmt.Fprintln(os.Stderr, err)
 	if errors.Is(err, clim.ErrHelp) {
 		return 0
 	}
