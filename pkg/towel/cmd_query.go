@@ -1,11 +1,8 @@
 package towel
 
 import (
-	"bytes"
-	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
+	"os"
 
 	"github.com/marco-m/clim"
 )
@@ -36,12 +33,15 @@ func (cmd *queryCmd) Run(app App) error {
 		return fmt.Errorf("query: %w", err)
 	}
 
-	jsonResponse, err := doQuery(app.HttpClient, config, cmd.JQL)
+	jsonResponses, count, err := doQuery(app.HttpClient, config, cmd.JQL)
 	if err != nil {
 		return fmt.Errorf("query: %s", err)
 	}
 
-	fmt.Println(string(jsonResponse))
+	fmt.Fprintln(os.Stderr, "total:", count)
+	for _, resp := range jsonResponses {
+		fmt.Println(string(resp))
+	}
 
 	// var queryResp queryResponse
 	// if err := json.Unmarshal(jsonResponse, &queryResp); err != nil {
@@ -50,27 +50,4 @@ func (cmd *queryCmd) Run(app App) error {
 	// usequeryResp
 
 	return nil
-}
-
-func doQuery(httpClient *http.Client, config configuration, jql string) ([]byte, error) {
-	// It seems that the only difference between v2 and v3 is that v2
-	// returns a plain text "Description" field, while v3 returns a
-	// Jira-specific sort of rich text format.
-	// For what we want to do, plain text is preferable.
-	//
-	//uri := "https://" + config.Server + "/rest/api/3/search"
-	uri := "https://" + config.Server + "/rest/api/2/search"
-
-	req := queryRequest{
-		JQL:        jql,
-		MaxResults: 50, // in any case pagination max is 50...
-		StartAt:    0,
-	}
-	ctx := context.Background()
-	reqBody, err := json.Marshal(req)
-	if err != nil {
-		return nil, fmt.Errorf("query: %s", err)
-	}
-
-	return post(ctx, httpClient, config.Email, config.ApiToken, uri, bytes.NewReader(reqBody))
 }

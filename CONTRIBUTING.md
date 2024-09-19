@@ -50,7 +50,7 @@ https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/#status-codes
       },
       "additionalProperties": false
     },
-    "status": { 
+    "status": {
       "type": "integer"
     }
   },
@@ -66,13 +66,13 @@ Expansion
 
 Pagination
 > The Jira REST API uses pagination to improve performance. Pagination is enforced for operations that could return a large collection of items. When you make a request to a paginated resource, the response wraps the returned array of values in a JSON object with paging metadata.
-> 
+>
 > Each operation can have a different limit for the number of items returned, and these limits may change without notice.
 
 The text also explains how to adapt to any limit.
 
 Ordering
-> Some operations support ordering the elements of a response by a field. 
+> Some operations support ordering the elements of a response by a field.
 
 ## JQL
 
