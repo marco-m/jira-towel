@@ -363,6 +363,7 @@ func post(
 	return do(ctx, hclient, user, token, uri, reqBody, http.MethodPost)
 }
 
+//nolint:unused
 func get(
 	ctx context.Context, hclient *http.Client, user string, token string, uri string,
 ) ([]byte, error) {
