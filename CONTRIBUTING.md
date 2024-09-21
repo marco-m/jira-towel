@@ -4,11 +4,15 @@ Please, before opening a PR, open a ticket to discuss your use case. This allows
 
 We care about code quality, readability and tests, so please follow the current style and provide adequate test coverage. In case of doubts about how to tackle testing something, feel free to ask.
 
+## Goreleaser
+
+Local testing:
+
+goreleaser release --snapshot --clean --skip publish
+
 ## Credentials
 
 https://id.atlassian.com/manage-profile/security/api-tokens
-
-
 
 ## Development
 

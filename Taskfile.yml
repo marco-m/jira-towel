@@ -7,7 +7,7 @@ vars:
   # As of Go 1.21, we still need to use the linker to embed version information.
   # See https://github.com/golang/go/issues/50603
   VERSION: { sh: git describe --long --dirty --always --tags }
-  LDFLAGS: '-ldflags="-X github.com/marco-m/jira-towel/internal.linkerVersion={{.VERSION}}"'
+  LDFLAGS: '-ldflags="-X github.com/marco-m/jira-towel/internal.version={{.VERSION}}"'
 
 tasks:
 
