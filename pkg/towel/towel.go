@@ -51,6 +51,7 @@ func MainErr(args []string) error {
 
 	cli.AddCLI(newInitCLI())
 	cli.AddCLI(newGraphCLI())
+	cli.AddCLI(newGanttCLI())
 	cli.AddCLI(newQueryCLI())
 	cli.AddCLI(newDotCLI())
 	cli.AddCLI(versionCmd)

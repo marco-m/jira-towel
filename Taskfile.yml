@@ -79,3 +79,8 @@ tasks:
     desc: Lint the code.
     cmds:
       - golangci-lint run ./...
+
+  gantt:
+    desc: Generates a GANTT chart with PlantUML
+    cmds:
+      - plantuml fixme
