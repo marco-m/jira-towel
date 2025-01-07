@@ -72,27 +72,20 @@ type issue struct {
 }
 
 type fields struct {
-	IssueType issueType `json:"issuetype"`
-	Parent    *issue    `json:"parent"`
-	Project   project   `json:"project"`
-	Priority  struct {
-		Name string `json:"name"`
-	} `json:"priority"`
+	IssueType   issueType     `json:"issuetype"`
+	Parent      *issue        `json:"parent"`
+	Project     project       `json:"project"`
+	Priority    priority      `json:"priority"`
 	Labels      []interface{} `json:"labels"`
 	Issuelinks  []issuelink   `json:"issuelinks"`
 	Assignee    interface{}   `json:"assignee"`
 	Status      status        `json:"status"`
 	Description interface{}   `json:"description"`
 	Summary     string        `json:"summary"`
-	Creator     struct {
-		DisplayName string `json:"displayName"`
-	} `json:"creator"`
-	Subtasks []interface{} `json:"subtasks"`
-	Duedate  interface{}   `json:"duedate"`
-	Progress struct {
-		Progress int `json:"progress"`
-		Total    int `json:"total"`
-	} `json:"progress"`
+	Creator     creator       `json:"creator"`
+	Subtasks    []interface{} `json:"subtasks"`
+	Duedate     interface{}   `json:"duedate"`
+	Progress    progress      `json:"progress"`
 
 	// HACK. Sigh.
 	// I think I never found something as badly designed as Jira.
@@ -101,17 +94,37 @@ type fields struct {
 	CustomFields map[string]any `mapstructure:",remain"`
 }
 
+type progress struct {
+	Progress int `json:"progress"`
+	Total    int `json:"total"`
+}
+
+type creator struct {
+	DisplayName string `json:"displayName"`
+}
+
+type priority struct {
+	Name string `json:"name"`
+}
+
 type issuelink struct {
-	OutwardIssue issue `json:"outwardIssue"`
-	InwardIssue  issue `json:"inwardIssue"`
-	// NOTE The 3 fields below are always the same, for example Name = Blocks,
-	// so there is no direction information! The direction is determined by
-	// which one of OutwardIssue or InwardIssue is filled.
-	Type struct {
-		Inward  string `json:"inward"`
-		Name    string `json:"name"`
-		Outward string `json:"outward"`
-	} `json:"type"`
+	OutwardIssue issue    `json:"outwardIssue"`
+	InwardIssue  issue    `json:"inwardIssue"`
+	Type         linkType `json:"type"`
+}
+
+// NOTE The 3 fields below are always the same, for example:
+//
+//	Name: Blocks
+//	Inward: "is blocked by"
+//	Outward: "blocks"
+//
+// so there is no direction information! The direction is determined by
+// which one of OutwardIssue or InwardIssue is filled :-/
+type linkType struct {
+	Name    string `json:"name"`
+	Inward  string `json:"inward"`
+	Outward string `json:"outward"`
 }
 
 type project struct {

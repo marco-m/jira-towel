@@ -3,6 +3,7 @@ module github.com/marco-m/jira-towel
 go 1.23.0
 
 require (
+	github.com/alecthomas/repr v0.4.0
 	github.com/dominikbraun/graph v0.23.0
 	github.com/marco-m/clim v0.0.8
 	github.com/marco-m/rosina v0.0.0-20240909094911-3589601e6a49
