@@ -18,9 +18,11 @@ var (
 // 1. to support "go build", we must use the linker.
 // 2. to support "go install with remote path", we must use the `debug` package.
 // 3. as far as I understand it, "go install with local path" does not work.
-// See https://github.com/golang/go/issues/50603, to be able to use the `debug`
+// See https://github.com/golang/go/issues/50603 to be able to use the `debug`
 // package for all use cases.
-// Wow. It seems that finally Go 1.24 will do the right thing.
+// It seems that finally Go 1.24 will do the right thing, after 6 years.
+// It was discussed at least since Go1.13 (see https://github.com/golang/go/issues/29228)
+// See https://github.com/caddyserver/caddy/pull/4931
 func Version() string {
 	info, ok := debug.ReadBuildInfo()
 	if !ok {

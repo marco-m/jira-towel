@@ -1,5 +1,8 @@
 bin/
 .vscode/
-_scratch/
+scratch/
+
+gantt.puml
+name.png
 
 dist/

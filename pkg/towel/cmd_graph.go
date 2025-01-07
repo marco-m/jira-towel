@@ -1,7 +1,6 @@
 package towel
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -9,7 +8,6 @@ import (
 
 	"github.com/marco-m/clim"
 	"github.com/marco-m/jira-towel/pkg/text"
-	"github.com/mitchellh/mapstructure"
 )
 
 type graphCmd struct {
@@ -60,47 +58,36 @@ func newGraphCLI() *clim.CLI[App] {
 }
 
 func (cmd *graphCmd) Run(app App) error {
+	const op = "graph"
 	config, err := loadConfig(app.ConfigDir)
 	if err != nil {
-		return fmt.Errorf("graph: %w", err)
+		return fmt.Errorf("%s: %s", op, err)
 	}
 
 	for _, kv := range cmd.CustomFields {
 		k, v, found := strings.Cut(kv, ":")
 		if !found {
-			return clim.ParseError("custom-fields: %q: missing separator ':'", kv)
+			return clim.ParseError("%s: custom-fields: %q: missing separator ':'",
+				op, kv)
 		}
 		id, err := strconv.Atoi(v)
 		if err != nil {
-			return clim.ParseError("custom-fields: %q: %q is not a number: %s",
-				kv, v, err)
+			return clim.ParseError("%s: custom-fields: %q: %q is not a number: %s",
+				op, kv, v, err)
 		}
 		cmd.CfLUT[k] = id
 	}
 
-	jsonResponses, count, err := doQuery(app.HttpClient, config, cmd.JQL)
+	issues, err := fetchIssues(app.HttpClient, config, cmd.JQL)
 	if err != nil {
-		return fmt.Errorf("graph: %s", err)
-	}
-	issues := make([]issue, 0, count)
-
-	for _, jsonresp := range jsonResponses {
-		var parsedMap map[string]any
-		if err := json.Unmarshal(jsonresp, &parsedMap); err != nil {
-			return fmt.Errorf("query: JSON: %s", err)
-		}
-		var queryResp queryResponse
-		if err = mapstructure.Decode(parsedMap, &queryResp); err != nil {
-			return fmt.Errorf("query: mapstructure: %s", err)
-		}
-		issues = append(issues, queryResp.Issues...)
+		return fmt.Errorf("%s: %s", op, err)
 	}
 
 	printSummary(issues)
 
 	dot := makeGraph(issues, cmd.Rankdir, cmd.CfLUT, cmd.ClusterBy)
 	if err := os.WriteFile(cmd.DotPath, []byte(dot), 0o660); err != nil {
-		return fmt.Errorf("writing %s: %s", cmd.DotPath, err)
+		return fmt.Errorf("%s: writing %s: %s", op, cmd.DotPath, err)
 	}
 	return nil
 }

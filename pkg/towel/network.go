@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/http"
 	"os"
+
+	"github.com/mitchellh/mapstructure"
 )
 
 // CustomfieldValue returns the value of custom field 'name' from map
@@ -127,7 +129,7 @@ type status struct {
 }
 
 func doQuery(httpClient *http.Client, config Config, jql string,
-) ([][]byte, int, error) {
+) ([][]byte, error) {
 	// It seems that the only difference between v2 and v3 is that v2
 	// returns a plain text "Description" field, while v3 returns a
 	// Jira-specific sort of rich text format.
@@ -150,16 +152,16 @@ func doQuery(httpClient *http.Client, config Config, jql string,
 	for range 500 {
 		reqBody, err := json.Marshal(req)
 		if err != nil {
-			return nil, 0, fmt.Errorf("query: %s", err)
+			return nil, fmt.Errorf("query: %s", err)
 		}
 		reply, err := post(ctx, httpClient, config.Email, config.ApiToken, endpoint,
 			bytes.NewReader(reqBody))
 		if err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 
 		if err := json.Unmarshal(reply, &pagination); err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 		result = append(result, reply)
 
@@ -170,7 +172,7 @@ func doQuery(httpClient *http.Client, config Config, jql string,
 		fmt.Fprint(os.Stderr, req.StartAt, " ")
 	}
 
-	return result, pagination.Total, nil
+	return result, nil
 }
 
 func post(
@@ -227,4 +229,31 @@ func do(
 	}
 
 	return body, nil
+}
+
+// Like [doQuery], but it also does the parsing to a slice of [issue].
+func fetchIssues(httpClient *http.Client, config Config, jql string) ([]issue, error) {
+	const op = "fetch"
+	jsonResponses, err := doQuery(httpClient, config, jql)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %s", op, err)
+	}
+	return parseResponses(jsonResponses)
+}
+
+func parseResponses(jsonResponses [][]byte) ([]issue, error) {
+	const op = "parseResonses"
+	issues := make([]issue, 0, len(jsonResponses))
+	for _, jsonresp := range jsonResponses {
+		var parsedMap map[string]any
+		if err := json.Unmarshal(jsonresp, &parsedMap); err != nil {
+			return nil, fmt.Errorf("%s: JSON: %s", op, err)
+		}
+		var queryResp queryResponse
+		if err := mapstructure.Decode(parsedMap, &queryResp); err != nil {
+			return nil, fmt.Errorf("%s: mapstructure: %s", op, err)
+		}
+		issues = append(issues, queryResp.Issues...)
+	}
+	return issues, nil
 }

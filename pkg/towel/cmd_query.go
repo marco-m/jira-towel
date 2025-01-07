@@ -33,12 +33,12 @@ func (cmd *queryCmd) Run(app App) error {
 		return fmt.Errorf("query: %w", err)
 	}
 
-	jsonResponses, count, err := doQuery(app.HttpClient, config, cmd.JQL)
+	jsonResponses, err := doQuery(app.HttpClient, config, cmd.JQL)
 	if err != nil {
 		return fmt.Errorf("query: %s", err)
 	}
 
-	fmt.Fprintln(os.Stderr, "total:", count)
+	fmt.Fprintln(os.Stderr, "total:", len(jsonResponses))
 	for _, resp := range jsonResponses {
 		fmt.Println(string(resp))
 	}
