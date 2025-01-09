@@ -1,10 +1,10 @@
-package towel_test
+package jira_test
 
 import (
 	"encoding/json"
 	"testing"
 
-	"github.com/marco-m/jira-towel/pkg/towel"
+	"github.com/marco-m/jira-towel/pkg/jira"
 	"github.com/marco-m/rosina"
 	"github.com/mitchellh/mapstructure"
 )
@@ -61,7 +61,7 @@ func TestMapstructureCanHelp(t *testing.T) {
 	err = mapstructure.Decode(parsedMap, &result)
 	rosina.AssertNoError(t, err)
 
-	have := towel.CustomfieldValue(result.Absurds, lut, "product")
+	have := jira.CustomfieldValue(result.Absurds, lut, "product")
 	want := "i am product X"
 	rosina.AssertEqual(t, have, want, "customfield existing")
 }
@@ -80,23 +80,23 @@ func TestCustomFieldValue(t *testing.T) {
 		"customfield_34":   "I am broken also",
 	}
 
-	have := towel.CustomfieldValue(customfields, lut, "product")
+	have := jira.CustomfieldValue(customfields, lut, "product")
 	want := "i am product X"
 	rosina.AssertEqual(t, have, want, "customfield product")
 
-	have = towel.CustomfieldValue(customfields, lut, "feature")
+	have = jira.CustomfieldValue(customfields, lut, "feature")
 	want = "i am feature 2"
 	rosina.AssertEqual(t, have, want, "customfield feature")
 
-	have = towel.CustomfieldValue(customfields, lut, "non-existing")
+	have = jira.CustomfieldValue(customfields, lut, "non-existing")
 	want = ""
 	rosina.AssertEqual(t, have, want, "customfield non-existing")
 
-	have = towel.CustomfieldValue(customfields, lut, "broken-1")
+	have = jira.CustomfieldValue(customfields, lut, "broken-1")
 	want = ""
 	rosina.AssertEqual(t, have, want, "customfield broken-1")
 
-	have = towel.CustomfieldValue(customfields, lut, "broken-2")
+	have = jira.CustomfieldValue(customfields, lut, "broken-2")
 	want = ""
 	rosina.AssertEqual(t, have, want, "customfield broken-2")
 }

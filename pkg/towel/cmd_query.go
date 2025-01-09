@@ -6,6 +6,7 @@ import (
 
 	"github.com/alecthomas/repr"
 	"github.com/marco-m/clim"
+	"github.com/marco-m/jira-towel/pkg/jira"
 )
 
 type queryCmd struct {
@@ -80,7 +81,7 @@ func (cmd *queryCmd) Run(app App) error {
 	return nil
 }
 
-func dumpTicket(ticket issue) {
+func dumpTicket(ticket jira.Issue) {
 	pr := repr.New(os.Stdout, repr.IgnorePrivate())
 	pr.Println(ticket)
 }

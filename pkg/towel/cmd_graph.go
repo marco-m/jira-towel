@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/marco-m/clim"
+	"github.com/marco-m/jira-towel/pkg/jira"
 	"github.com/marco-m/jira-towel/pkg/text"
 )
 
@@ -92,7 +93,7 @@ func (cmd *graphCmd) Run(app App) error {
 	return nil
 }
 
-func makeGraph(issues []issue, rankdir string, lut map[string]int, clusterby string) string {
+func makeGraph(issues []jira.Issue, rankdir string, lut map[string]int, clusterby string) string {
 	var bld strings.Builder
 	fmt.Fprintln(&bld, "digraph {")
 	fmt.Fprintf(&bld, "    rankdir=%s\n", rankdir)
@@ -103,7 +104,7 @@ func makeGraph(issues []issue, rankdir string, lut map[string]int, clusterby str
 	clusters := make(map[string][]string)
 
 	for _, ticket := range issues {
-		clusterName := CustomfieldValue(ticket.Fields.CustomFields, lut, clusterby)
+		clusterName := jira.CustomfieldValue(ticket.Fields.CustomFields, lut, clusterby)
 		clusters[clusterName] = append(clusters[clusterName], ticket.Key)
 		fmt.Fprintln(&bld, makeNode(ticket, indent))
 		for _, edge := range makeEdges(ticket, indent) {
@@ -154,7 +155,7 @@ func makeClusters(clusters map[string][]string, indent string) string {
 	return bld.String()
 }
 
-func makeNode(ticket issue, indent string) string {
+func makeNode(ticket jira.Issue, indent string) string {
 	const maxWidth = 40
 	// if ticket.Fields.IssueType.Name == "Epic" {
 	// 	return ""
@@ -192,9 +193,9 @@ func nodeColor(status string) string {
 	}
 }
 
-func makeEdges(ticket issue, indent string) []string {
+func makeEdges(ticket jira.Issue, indent string) []string {
 	var output []string
-	links := ticket.Fields.Issuelinks
+	links := ticket.Fields.IssueLinks
 	src := ticket.Key
 	var dst string
 	var relation string
@@ -228,7 +229,7 @@ func edgeColor(relation string) string {
 	}
 }
 
-func printSummary(issues []issue) {
+func printSummary(issues []jira.Issue) {
 	fmt.Printf("received %d issues\n", len(issues))
 	for _, ticket := range issues {
 		fmt.Println("============")
@@ -239,12 +240,12 @@ func printSummary(issues []issue) {
 	}
 }
 
-func printFirstLine(issue issue) {
+func printFirstLine(issue jira.Issue) {
 	fmt.Printf("%s (%s) %s\n",
 		issue.Key, issue.Fields.IssueType.Name, issue.Fields.Summary)
 }
 
-func printParent(issue issue) {
+func printParent(issue jira.Issue) {
 	fmt.Print("parent: ")
 	if issue.Fields.Parent != nil {
 		printFirstLine(*issue.Fields.Parent)
@@ -253,8 +254,8 @@ func printParent(issue issue) {
 	}
 }
 
-func printRelations(issue issue) {
-	issueLinks := issue.Fields.Issuelinks
+func printRelations(issue jira.Issue) {
+	issueLinks := issue.Fields.IssueLinks
 	for _, link := range issueLinks {
 		// NOTE It should be impossible to have both Outward and Inward.
 		if link.OutwardIssue.Key != "" {

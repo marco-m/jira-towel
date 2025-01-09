@@ -3,6 +3,7 @@ package towel
 import (
 	"github.com/dominikbraun/graph"
 	"github.com/marco-m/clim"
+	"github.com/marco-m/jira-towel/pkg/jira"
 )
 
 type dotCmd struct {
@@ -19,23 +20,23 @@ func newDotCLI() *clim.CLI[App] {
 }
 
 func (cmd *dotCmd) Run(app App) error {
-	issueHash := func(c issue) string {
+	issueHash := func(c jira.Issue) string {
 		return c.Key
 	}
 	g := graph.New(issueHash)
 
-	// so it seems that i need to parse the issue, since the issuelinks field is actually a list of edges!
+	// so it seems that i need to parse the jira.Issue, since the issuelinks field is actually a list of edges!
 	// and i must add the nodes in the issuelink, also if incomplete (only Key known) and maybe already present...
 
-	_ = g.AddVertex(issue{
+	_ = g.AddVertex(jira.Issue{
 		Key: "CICCIO-1",
-		Fields: fields{
-			Status: status{Name: "to do"},
-			Issuelinks: []issuelink{
+		Fields: jira.Fields{
+			Status: jira.Status{Name: "to do"},
+			IssueLinks: []jira.IssueLink{
 				{
-					OutwardIssue: issue{
+					OutwardIssue: jira.Issue{
 						Key:    "CICCIO-2",
-						Fields: fields{},
+						Fields: jira.Fields{},
 					},
 				},
 			},

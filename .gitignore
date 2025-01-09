@@ -1,8 +1,11 @@
 bin/
 .vscode/
 scratch/
+_scratch/
 
 gantt.puml
 name.png
+graph.dot
+graph.png
 
 dist/
