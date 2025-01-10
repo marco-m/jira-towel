@@ -2,6 +2,7 @@ bin/
 .vscode/
 scratch/
 _scratch/
+__debug_bin*
 
 gantt.puml
 name.png
