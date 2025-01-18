@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/marco-m/jira-towel/internal/testutils"
 	"github.com/marco-m/jira-towel/pkg/jira"
 	"github.com/marco-m/rosina"
 	"github.com/mitchellh/mapstructure"
@@ -99,4 +100,24 @@ func TestCustomFieldValue(t *testing.T) {
 	have = jira.CustomfieldValue(customfields, lut, "broken-2")
 	want = ""
 	rosina.AssertEqual(t, have, want, "customfield broken-2")
+}
+
+func TestBlockedBy(t *testing.T) {
+	want := []string{"FOO-1", "FOO-2"}
+	issue := testutils.BuildIssue(
+		testutils.BuildArg{Key: "FOO-7", Blocks: want},
+	)
+
+	have := jira.BlockedBy(issue)
+	rosina.AssertDeepEqual(t, have, want, "blocked-by")
+}
+
+func TestBlocks(t *testing.T) {
+	want := []string{"FOO-1", "FOO-2"}
+	issue := testutils.BuildIssue(
+		testutils.BuildArg{Key: "FOO-7", BlockedBy: want},
+	)
+
+	have := jira.Blocks(issue)
+	rosina.AssertDeepEqual(t, have, want, "blocks")
 }

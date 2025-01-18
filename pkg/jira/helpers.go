@@ -1,6 +1,8 @@
 package jira
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // CustomfieldValue returns the value of custom field 'name' from map
 // 'customFields', which is assumed to be filled by github.com/mitchellh/mapstructure.
@@ -33,4 +35,28 @@ func CustomfieldValue(customFields map[string]any, lut map[string]int, name stri
 		return ""
 	}
 	return value
+}
+
+// BlockedbBy returns the issue Keys that are blocked by 'issue'.
+func BlockedBy(issue Issue) []string {
+	var result []string
+	for _, link := range issue.Fields.IssueLinks {
+		key := link.OutwardIssue.Key
+		if key != "" && link.Type.Name == LinkTypeBlocks {
+			result = append(result, key)
+		}
+	}
+	return result
+}
+
+// Blocks returns the issue Keys that block 'issue'.
+func Blocks(issue Issue) []string {
+	var result []string
+	for _, link := range issue.Fields.IssueLinks {
+		key := link.InwardIssue.Key
+		if key != "" && link.Type.Name == LinkTypeBlocks {
+			result = append(result, key)
+		}
+	}
+	return result
 }
