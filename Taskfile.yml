@@ -11,6 +11,13 @@ vars:
 
 tasks:
 
+  pre-commit:
+    cmds:
+      - task: build
+      - task: lint
+      # - task: check-coverage
+      - cmd: go mod tidy
+
   install:deps:
     desc: Install tool dependencies.
     cmds:

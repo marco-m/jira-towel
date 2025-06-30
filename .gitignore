@@ -1,4 +1,5 @@
 bin/
 .vscode/
+_scratch/
 
 dist/

@@ -8,7 +8,7 @@ import (
 // These variables must be set by the linker (see Taskfile or .goreleaser.yaml).
 var (
 	version = "unknown"
-	commit  = "unknown"
+	// commit  = "unknown"
 )
 
 // Version reports the version of the main package of the binary.

@@ -205,7 +205,7 @@ func do(
 	if err != nil {
 		return nil, fmt.Errorf("do: %s", err)
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() // nolint:errcheck
 
 	body, errBody := io.ReadAll(resp.Body)
 
